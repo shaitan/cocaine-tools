@@ -111,7 +111,7 @@ NG_ACTIONS = {
 
     'runlist:list': JsonToolHandler(runlist.List),
     'runlist:view': JsonToolHandler(runlist.View),
-    'runlist:add-app': JsonToolHandler(runlist.AddApplication),
+    'runlist:add-app': ToolHandler(runlist.AddApplication),
     'runlist:create': ToolHandler(runlist.Create),
     'runlist:upload': ToolHandler(runlist.Upload),
     'runlist:remove': ToolHandler(runlist.Remove),

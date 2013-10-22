@@ -1,8 +1,9 @@
 
 
 from cocaine.futures import chain
-from cocaine.tools import actions, log
+from cocaine.tools import actions
 from cocaine.tools.actions import CocaineConfigReader
+from cocaine.tools.printer import printer
 from cocaine.tools.tags import RUNLISTS_TAGS
 
 __author__ = 'Evgeny Safronov <division494@gmail.com>'
@@ -33,9 +34,8 @@ class Upload(Specific):
     @chain.source
     def execute(self):
         runlist = CocaineConfigReader.load(self.runlist)
-        log.info('Uploading "%s"... ', self.name)
-        yield self.storage.write('runlists', self.name, runlist, RUNLISTS_TAGS)
-        log.info('OK')
+        with printer('Uploading runlist "%s"', self.name):
+            yield self.storage.write('runlists', self.name, runlist, RUNLISTS_TAGS)
 
 
 class Create(Specific):
@@ -46,9 +46,8 @@ class Create(Specific):
 class Remove(Specific):
     @chain.source
     def execute(self):
-        log.info('Removing "%s"... ', self.name)
-        yield self.storage.remove('runlists', self.name)
-        log.info('OK')
+        with printer('Removing runlist "%s"', self.name):
+            yield self.storage.remove('runlists', self.name)
 
 
 class AddApplication(Specific):
@@ -64,24 +63,18 @@ class AddApplication(Specific):
 
     @chain.source
     def execute(self):
-        result = {
-            'runlist': self.name,
-            'status': 'modified',
-            'added': {
-                'app': self.app,
-                'profile': self.profile,
-            }
-        }
+        with printer('Checking runlists') as notify:
+            runlists = yield List(self.storage).execute()
+            status = 'found' if self.name in runlists else 'not found'
+            notify(status)
 
-        runlists = yield List(self.storage).execute()
-        if self.force and self.name not in runlists:
-            log.debug('Runlist does not exist. Creating new one ...')
-            yield Create(self.storage, self.name).execute()
-            result['status'] = 'created'
+        if self.name not in runlists:
+            if self.force:
+                with printer('Runlist does not exist.'):
+                    yield Create(self.storage, self.name).execute()
 
-        runlist = yield View(self.storage, name=self.name).execute()
-        log.debug('Found runlist: {0}'.format(runlist))
-        runlist[self.app] = self.profile
-        runlistUploadAction = Upload(self.storage, name=self.name, runlist=runlist)
-        yield runlistUploadAction.execute()
-        yield result
+        with printer('Editing runlist "%s"', self.name):
+            runlist = yield View(self.storage, name=self.name).execute()
+            runlist[self.app] = self.profile
+
+        yield Upload(self.storage, name=self.name, runlist=runlist).execute()
