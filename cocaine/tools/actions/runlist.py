@@ -1,5 +1,3 @@
-
-
 from cocaine.futures import chain
 from cocaine.tools import actions
 from cocaine.tools.actions import CocaineConfigReader
