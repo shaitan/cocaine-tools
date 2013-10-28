@@ -24,6 +24,7 @@ import re
 import httplib
 import traceback
 import functools
+from cocaine import concurrent
 
 import msgpack
 import signal
@@ -34,7 +35,6 @@ from tornado import ioloop
 from cocaine.services import Service
 from cocaine.exceptions import ServiceError
 from cocaine.exceptions import ChokeEvent
-from cocaine.futures import chain
 
 
 RECONNECT_START = "Start asynchronous reconnect %s"
@@ -164,7 +164,7 @@ class CocaineProxy(object):
             except Exception as err:
                 return None
 
-    @chain.source
+    @concurrent.engine
     def process(self, obj, service, event, data):
         message_parts = []
         try:

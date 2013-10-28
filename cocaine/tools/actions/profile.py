@@ -1,4 +1,4 @@
-from cocaine.futures import chain
+from cocaine import concurrent
 from cocaine.tools import actions
 from cocaine.tools.actions import CocaineConfigReader, log
 from cocaine.tools.printer import printer
@@ -29,7 +29,7 @@ class Upload(Specific):
         if not self.profile:
             raise ValueError('Please specify profile file path')
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         with printer('Loading profile'):
             profile = CocaineConfigReader.load(self.profile)
@@ -38,7 +38,7 @@ class Upload(Specific):
 
 
 class Remove(Specific):
-    @chain.source
+    @concurrent.engine
     def execute(self):
         log.info('Removing "%s"... ', self.name)
         yield self.storage.remove('profiles', self.name)

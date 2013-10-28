@@ -1,8 +1,9 @@
 import ast
 import re
 
+from cocaine import concurrent
+from cocaine.concurrent import return_
 from cocaine.exceptions import ServiceError
-from cocaine.futures import chain
 from cocaine.services import Service
 from cocaine.tools.error import ServiceCallError
 
@@ -22,7 +23,7 @@ class NodeInfo(Node):
         super(NodeInfo, self).__init__(node)
         self.locator = locator
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         appNames = yield self.node.list()
         appInfoList = {}
@@ -39,7 +40,7 @@ class NodeInfo(Node):
         result = {
             'apps': appInfoList
         }
-        yield result
+        return_(result)
 
 
 class Call(object):
@@ -56,7 +57,7 @@ class Call(object):
         else:
             self.methodName = methodWithArguments
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         service = self.getService()
         response = {

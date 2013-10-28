@@ -4,8 +4,8 @@ import errno
 import tarfile
 import msgpack
 
+from cocaine import concurrent
 from cocaine.asio.exceptions import ConnectionError, ConnectionRefusedError
-from cocaine.futures import chain
 from cocaine.services import Service
 from cocaine.tools import log
 
@@ -91,7 +91,7 @@ class View(Specific):
         super(View, self).__init__(storage, entity, name)
         self.collection = collection
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         value = yield self.storage.read(self.collection, self.name)
         yield msgpack.loads(value)

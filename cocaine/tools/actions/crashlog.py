@@ -1,7 +1,6 @@
 import time
-from cocaine.asio import engine
 
-from cocaine.futures import chain
+from cocaine import concurrent
 from cocaine.tools import actions
 from cocaine.tools.actions import app
 
@@ -35,7 +34,7 @@ class Specific(actions.Storage):
 
 
 class View(Specific):
-    @chain.source
+    @concurrent.engine
     def execute(self):
         crashlogs = yield self.storage.find('crashlogs', [self.name])
         parsedCrashlogs = _parseCrashlogs(crashlogs, timestamp=self.timestamp)
@@ -48,7 +47,7 @@ class View(Specific):
 
 
 class Remove(Specific):
-    @chain.source
+    @concurrent.engine
     def execute(self):
         crashlogs = yield self.storage.find('crashlogs', [self.name])
         parsedCrashlogs = _parseCrashlogs(crashlogs, timestamp=self.timestamp)
@@ -64,7 +63,7 @@ class RemoveAll(Remove):
 
 
 class Status(actions.Storage):
-    @engine.asynchronous
+    @concurrent.engine
     def execute(self):
         applications = yield app.List(self.storage).execute()
         crashed = []

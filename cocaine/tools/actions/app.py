@@ -6,11 +6,10 @@ import tarfile
 import tempfile
 import msgpack
 
-from cocaine.asio import engine
+from cocaine import concurrent
 from cocaine.asio.exceptions import LocatorResolveError
 from cocaine.asio.service import Service
 from cocaine.exceptions import ServiceError
-from cocaine.futures import chain
 from cocaine.tools import actions, log
 from cocaine.tools.actions import common, readArchive, CocaineConfigReader, docker
 from cocaine.tools.actions.common import NodeInfo
@@ -65,7 +64,7 @@ class Upload(actions.Storage):
         if not self.package:
             raise ValueError('Please specify package of the app')
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         with printer('Loading manifest'):
             manifest = CocaineConfigReader.load(self.manifest)
@@ -91,7 +90,7 @@ class Remove(actions.Storage):
         if not self.name:
             raise ValueError('Empty application name')
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         with printer('Removing "%s"', self.name):
             apps = yield List(self.storage).execute()
@@ -137,7 +136,7 @@ class Restart(common.Node):
         if not self.name:
             raise ValueError('Please specify application name')
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         try:
             info = yield NodeInfo(self.node, self.locator).execute()
@@ -160,7 +159,7 @@ class Check(common.Node):
         if not self.name:
             raise ValueError('Please specify application name')
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         log.info('Checking "%s"... ', self.name)
         apps = yield List(self.storage).execute()
@@ -194,7 +193,7 @@ class DockerUpload(actions.Storage):
         if not address:
             raise ValueError('Docker address is not specified')
 
-    @engine.asynchronous
+    @concurrent.engine
     def execute(self):
         response = yield self.client.build(self.path, tag=self.name, streaming=self._on_read)
         if response.code != 200:
@@ -221,7 +220,7 @@ class LocalUpload(actions.Storage):
         if not self.name:
             raise ValueError(WRONG_APPLICATION_NAME.format(self.name))
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         try:
             repositoryPath = self._createRepository()
@@ -256,7 +255,7 @@ class LocalUpload(actions.Storage):
             shutil.copytree(self.path, repositoryPath)
             return repositoryPath
 
-    @chain.concurrent
+    @concurrent.engine
     def _createVirtualEnvironment(self, repositoryPath, manifestPath, Installer):
         log.debug('Creating virtual environment "{0}"...'.format(self.virtualEnvironmentType))
         stream = None
@@ -288,7 +287,7 @@ class UploadRemote(actions.Storage):
             match = rx.match(self.url)
             self.name = match.group('name')
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         repositoryPath = tempfile.mkdtemp()
         manifestPath = os.path.join(repositoryPath, 'manifest-start.json')
@@ -308,15 +307,15 @@ class UploadRemote(actions.Storage):
         except (RepositoryDownloadError, ModuleInstallError) as err:
             print(err)
 
-    @chain.concurrent
+    @concurrent.engine
     def cloneRepository(self, repositoryPath):
         self.repositoryDownloader.download(self.url, repositoryPath)
 
-    @chain.concurrent
+    @concurrent.engine
     def installRepository(self):
         self.moduleInstaller.install()
 
-    @chain.concurrent
+    @concurrent.engine
     def createPackage(self, repositoryPath, packagePath):
         tar = tarfile.open(packagePath, mode='w:gz')
         tar.add(repositoryPath, arcname='')
