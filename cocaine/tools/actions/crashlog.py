@@ -1,6 +1,7 @@
 import time
 
 from cocaine import concurrent
+from cocaine.concurrent import return_
 from cocaine.tools import actions
 from cocaine.tools.actions import app
 
@@ -43,7 +44,7 @@ class View(Specific):
             key = '%s:%s' % (crashlog[0], crashlog[2])
             content = yield self.storage.read('crashlogs', key)
             contents.append(content)
-        yield ''.join(contents)
+        return_(''.join(contents))
 
 
 class Remove(Specific):
@@ -54,7 +55,6 @@ class Remove(Specific):
         for crashlog in parsedCrashlogs:
             key = '%s:%s' % (crashlog[0], crashlog[2])
             yield self.storage.remove('crashlogs', key)
-        yield 'Done'
 
 
 class RemoveAll(Remove):
@@ -72,5 +72,5 @@ class Status(actions.Storage):
             if crashlogs:
                 last = max(_parseCrashlogs(crashlogs), key=lambda (timestamp, time, uuid): timestamp)
                 crashed.append((application, last, len(crashlogs)))
-        yield crashed
+        return_(crashed)
 

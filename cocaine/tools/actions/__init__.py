@@ -6,6 +6,7 @@ import msgpack
 
 from cocaine import concurrent
 from cocaine.asio.exceptions import ConnectionError, ConnectionRefusedError
+from cocaine.concurrent import return_
 from cocaine.services import Service
 from cocaine.tools import log
 
@@ -94,4 +95,4 @@ class View(Specific):
     @concurrent.engine
     def execute(self):
         value = yield self.storage.read(self.collection, self.name)
-        yield msgpack.loads(value)
+        return_(msgpack.loads(value))

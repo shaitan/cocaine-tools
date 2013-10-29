@@ -4,12 +4,13 @@ import re
 import shutil
 import tarfile
 import tempfile
+from cocaine.concurrent import return_
 import msgpack
 
 from cocaine import concurrent
 from cocaine.asio.exceptions import LocatorResolveError
-from cocaine.asio.service import Service
-from cocaine.exceptions import ServiceError
+from cocaine.services import Service
+from cocaine.services.exceptions import ServiceError
 from cocaine.tools import actions, log
 from cocaine.tools.actions import common, readArchive, CocaineConfigReader, docker
 from cocaine.tools.actions.common import NodeInfo
@@ -143,11 +144,9 @@ class Restart(common.Node):
             profile = self.profile or info['apps'][self.name]['profile']
             appStopStatus = yield Stop(self.node, name=self.name).execute()
             appStartStatus = yield Start(self.node, name=self.name, profile=profile).execute()
-            yield [appStopStatus, appStartStatus]
+            return_([appStopStatus, appStartStatus])
         except KeyError:
             raise ToolsError('Application "{0}" is not running and profile not specified'.format(self.name))
-        except Exception as err:
-            raise ToolsError('Unknown error - {0}'.format(err))
 
 
 class Check(common.Node):

@@ -2,7 +2,7 @@
 import errno
 import logging
 
-from cocaine.exceptions import CocaineError
+from cocaine.exceptions import Error as CocaineError
 from cocaine.tools import printer
 from cocaine.tools.cli import ToolsError
 from cocaine.tools.dispatcher import d
@@ -19,6 +19,14 @@ and services'''
 
 
 log = logging.getLogger('cocaine.tools')
+# import sys
+# log = 'cocaine.tools'
+# logs = [log, 'cocaine.concurrent.deferred', 'cocaine.services.base']
+# handler = logging.StreamHandler(stream=sys.stdout)
+# for log in map(logging.getLogger, logs):
+#     log.addHandler(handler)
+#     log.setLevel(logging.DEBUG)
+#     log.propagate = False
 
 
 if __name__ == '__main__':

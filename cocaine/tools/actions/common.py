@@ -3,8 +3,8 @@ import re
 
 from cocaine import concurrent
 from cocaine.concurrent import return_
-from cocaine.exceptions import ServiceError
 from cocaine.services import Service
+from cocaine.services.exceptions import ServiceError
 from cocaine.tools.error import ServiceCallError
 
 __author__ = 'Evgeny Safronov <division494@gmail.com>'
@@ -73,7 +73,7 @@ class Call(object):
             result = yield method(*args)
             response['request'] = 'invoke'
             response['response'] = result
-        yield response
+        return_(response)
 
     def getService(self):
         try:
@@ -87,7 +87,7 @@ class Call(object):
             method = service.__getattribute__(self.methodName)
             return method
         except AttributeError:
-            raise ServiceError(self.serviceName, 'method "{0}" is not found'.format(self.methodName), 1)
+            raise ServiceError(1, 'method "{0}" is not found'.format(self.methodName))
 
     def parseArguments(self):
         if not self.args:

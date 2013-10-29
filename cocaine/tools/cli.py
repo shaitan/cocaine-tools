@@ -6,7 +6,7 @@ from cocaine import concurrent
 import msgpack
 from tornado.ioloop import IOLoop
 
-from cocaine.exceptions import ChokeEvent
+from cocaine.protocol import ChokeEvent
 from cocaine.tools.actions import common, app, profile, runlist, crashlog, group
 from cocaine.tools.error import Error as ToolsError
 from cocaine.tools import log
