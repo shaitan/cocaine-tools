@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from cocaine import concurrent
 
 __author__ = 'EvgenySafronov <division494@gmail.com>'
 
@@ -23,7 +24,6 @@ if __name__ == '__main__':
         import sys
         import os
         from cocaine.services import Service
-        from cocaine.asio import engine
 
         ADEQUATE_TIMEOUT = 0.25
 
@@ -39,7 +39,7 @@ if __name__ == '__main__':
             'port': getOption('--port', '10053')
         }
 
-        @engine.asynchronous
+        @concurrent.engine
         def locateApps():
             apps = yield storage.find(*locateItems.get(config['locateItem']))
             with open('/tmp/1.txt', 'w') as fh:

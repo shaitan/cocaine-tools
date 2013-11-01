@@ -1,4 +1,4 @@
-from cocaine.futures import chain
+from cocaine import concurrent
 from cocaine.tools import actions
 from cocaine.tools.actions import CocaineConfigReader
 from cocaine.tools.printer import printer
@@ -29,7 +29,7 @@ class Upload(Specific):
         if not self.runlist:
             raise ValueError('Please specify runlist file path')
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         runlist = CocaineConfigReader.load(self.runlist)
         with printer('Uploading runlist "%s"', self.name):
@@ -42,7 +42,7 @@ class Create(Specific):
 
 
 class Remove(Specific):
-    @chain.source
+    @concurrent.engine
     def execute(self):
         with printer('Removing runlist "%s"', self.name):
             yield self.storage.remove('runlists', self.name)
@@ -59,7 +59,7 @@ class AddApplication(Specific):
         if not self.profile:
             raise ValueError('Please specify profile')
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         with printer('Checking runlists') as notify:
             runlists = yield List(self.storage).execute()

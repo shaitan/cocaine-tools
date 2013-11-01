@@ -60,6 +60,6 @@ def printer(message, *args):
         print_start(message)
         yield result.set
         print_success('{0}{1}'.format(message, result))
-    except Exception:
-        print_error('{0}{1}'.format(message, result))
+    except Exception as err:
+        print_error('{0}{1} - {2}'.format(message, result, err))
         raise

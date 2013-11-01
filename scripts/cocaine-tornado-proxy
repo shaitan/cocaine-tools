@@ -194,7 +194,7 @@ def get_service(name):
 
 TEMPLATE = "%(VERSION)s %(CODE)d %(STATUS)s\r\n%(HEADERS)s\r\n%(BODY)s"
 
-@chain.source
+@concurrent.engine
 def process(obj, service, event, data):
     message_parts = []
     try:

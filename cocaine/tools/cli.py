@@ -1,12 +1,12 @@
 import json
 import time
 import errno
+from cocaine import concurrent
 
 import msgpack
 from tornado.ioloop import IOLoop
 
-from cocaine.exceptions import ChokeEvent
-from cocaine.futures import chain
+from cocaine.protocol import ChokeEvent
 from cocaine.tools.actions import common, app, profile, runlist, crashlog, group
 from cocaine.tools.error import Error as ToolsError
 from cocaine.tools import log
@@ -19,7 +19,7 @@ class ToolHandler(object):
     def __init__(self, Action):
         self._Action = Action
 
-    @chain.source
+    @concurrent.engine
     def execute(self, **config):
         try:
             action = self._Action(**config)

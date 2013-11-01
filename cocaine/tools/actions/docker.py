@@ -2,12 +2,12 @@ import json
 import tarfile
 import StringIO
 import urllib
+from cocaine import concurrent
 
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 from tornado.ioloop import IOLoop
 
 from cocaine.tools import log
-from cocaine.futures import chain
 from cocaine.tools.helpers._unix import AsyncUnixHTTPClient
 
 __author__ = 'Evgeny Safronov <division494@gmail.com>'
@@ -97,21 +97,21 @@ class Action(object):
 
 
 class Info(Action):
-    @chain.source
+    @concurrent.engine
     def execute(self):
         response = yield self._http_client.fetch(self._make_url('/info'))
         yield response.body
 
 
 class Images(Action):
-    @chain.source
+    @concurrent.engine
     def execute(self):
         response = yield self._http_client.fetch(self._make_url('/images/json'))
         yield response.body
 
 
 class Containers(Action):
-    @chain.source
+    @concurrent.engine
     def execute(self):
         response = yield self._http_client.fetch(self._make_url('/containers/json'))
         yield json.loads(response.body)
@@ -127,7 +127,7 @@ class Build(Action):
         self._streaming = streaming
         self._io_loop = io_loop or IOLoop.current()
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         headers = None
         body = None
@@ -174,7 +174,7 @@ class Push(Action):
         self._streaming = streaming
         super(Push, self).__init__(url, version, timeout, io_loop)
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         url = self._make_url('/images/{0}/push'.format(self.name))
         registry, name = resolve_repository_name(self.name)

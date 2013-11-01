@@ -1,9 +1,10 @@
 import ast
 import re
 
-from cocaine.exceptions import ServiceError
-from cocaine.futures import chain
+from cocaine import concurrent
+from cocaine.concurrent import return_
 from cocaine.services import Service
+from cocaine.services.exceptions import ServiceError
 from cocaine.tools.error import ServiceCallError
 
 __author__ = 'Evgeny Safronov <division494@gmail.com>'
@@ -22,7 +23,7 @@ class NodeInfo(Node):
         super(NodeInfo, self).__init__(node)
         self.locator = locator
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         appNames = yield self.node.list()
         appInfoList = {}
@@ -39,7 +40,7 @@ class NodeInfo(Node):
         result = {
             'apps': appInfoList
         }
-        yield result
+        return_(result)
 
 
 class Call(object):
@@ -56,7 +57,7 @@ class Call(object):
         else:
             self.methodName = methodWithArguments
 
-    @chain.source
+    @concurrent.engine
     def execute(self):
         service = self.getService()
         response = {
@@ -72,7 +73,7 @@ class Call(object):
             result = yield method(*args)
             response['request'] = 'invoke'
             response['response'] = result
-        yield response
+        return_(response)
 
     def getService(self):
         try:
@@ -86,7 +87,7 @@ class Call(object):
             method = service.__getattribute__(self.methodName)
             return method
         except AttributeError:
-            raise ServiceError(self.serviceName, 'method "{0}" is not found'.format(self.methodName), 1)
+            raise ServiceError(1, 'method "{0}" is not found'.format(self.methodName))
 
     def parseArguments(self):
         if not self.args:

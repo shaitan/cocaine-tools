@@ -1,6 +1,6 @@
 import msgpack
 
-from cocaine.asio import engine
+from cocaine import concurrent
 from cocaine.tools import actions
 from cocaine.tools.actions import CocaineConfigReader
 from cocaine.tools.tags import GROUPS_TAGS
@@ -25,7 +25,7 @@ class Create(actions.Specific):
         super(Create, self).__init__(storage, 'group', name)
         self.content = content
 
-    @engine.asynchronous
+    @concurrent.engine
     def execute(self):
         if self.content:
             content = CocaineConfigReader.load(self.content, validate=self._validate)
@@ -53,7 +53,7 @@ class Refresh(actions.Storage):
         self.locator = locator
         self.name = name
 
-    @engine.asynchronous
+    @concurrent.engine
     def execute(self):
         names = yield List(self.storage).execute() if not self.name else [self.name]
         for name in names:
@@ -66,7 +66,7 @@ class AddApplication(actions.Specific):
         self.app = app
         self.weight = int(weight)
 
-    @engine.asynchronous
+    @concurrent.engine
     def execute(self):
         group = yield self.storage.read(GROUP_COLLECTION, self.name)
         group = msgpack.loads(group)
@@ -79,7 +79,7 @@ class RemoveApplication(actions.Specific):
         super(RemoveApplication, self).__init__(storage, 'group', name)
         self.app = app
 
-    @engine.asynchronous
+    @concurrent.engine
     def execute(self):
         group = yield self.storage.read(GROUP_COLLECTION, self.name)
         group = msgpack.loads(group)
