@@ -158,17 +158,15 @@ def middleware(func):
 
 
 d = Dispatcher(globaloptions=Global.options, middleware=middleware)
-appDispatcher = Dispatcher(globaloptions=Global.options, middleware=middleware)
 
 
 class dispatcher:
+    app = Dispatcher(globaloptions=Global.options, middleware=middleware)
+    profile = Dispatcher(globaloptions=Global.options, middleware=middleware)
+    runlist = Dispatcher(globaloptions=Global.options, middleware=middleware)
+    crashlog = Dispatcher(globaloptions=Global.options, middleware=middleware)
     group = Dispatcher(globaloptions=Global.options, middleware=middleware)
-
-
-profileDispatcher = Dispatcher(globaloptions=Global.options, middleware=middleware)
-runlistDispatcher = Dispatcher(globaloptions=Global.options, middleware=middleware)
-crashlogDispatcher = Dispatcher(globaloptions=Global.options, middleware=middleware)
-proxyDispatcher = Dispatcher()
+    proxy = Dispatcher()
 
 
 @d.command()
@@ -203,7 +201,7 @@ def call(options,
     })
 
 
-@appDispatcher.command(name='list')
+@dispatcher.app.command(name='list')
 def app_list(options):
     """Show installed applications list."""
     options.executor.executeAction('app:list', **{
@@ -211,7 +209,7 @@ def app_list(options):
     })
 
 
-@appDispatcher.command(usage='--name=NAME', name='view')
+@dispatcher.app.command(name='view', usage='--name=NAME')
 def app_view(options,
              name=('n', '', 'application name')):
     """Show manifest context for application.
@@ -224,7 +222,7 @@ def app_view(options,
     })
 
 
-@appDispatcher.command(name='upload', usage='[PATH] [--name=NAME] [--manifest=MANIFEST] [--package=PACKAGE]')
+@dispatcher.app.command(name='upload', usage='[PATH] [--name=NAME] [--manifest=MANIFEST] [--package=PACKAGE]')
 def app_upload(options,
                path=None,
                name=('n', '', 'application name'),
@@ -284,7 +282,7 @@ def app_upload(options,
         })
 
 
-@appDispatcher.command(name='remove')
+@dispatcher.app.command(name='remove')
 def app_remove(options,
                name=('n', '', 'application name')):
     """Remove application from storage.
@@ -297,7 +295,7 @@ def app_remove(options,
     })
 
 
-@appDispatcher.command(name='start')
+@dispatcher.app.command(name='start')
 def app_start(options,
               name=('n', '', 'application name'),
               profile=('r', '', 'profile name')):
@@ -312,7 +310,7 @@ def app_start(options,
     })
 
 
-@appDispatcher.command(name='pause')
+@dispatcher.app.command(name='pause')
 def app_pause(options,
               name=('n', '', 'application name')):
     """Stop application.
@@ -325,7 +323,7 @@ def app_pause(options,
     })
 
 
-@appDispatcher.command(name='stop')
+@dispatcher.app.command(name='stop')
 def app_stop(options,
              name=('n', '', 'application name')):
     """Stop application."""
@@ -335,7 +333,7 @@ def app_stop(options,
     })
 
 
-@appDispatcher.command(name='restart')
+@dispatcher.app.command(name='restart')
 def app_restart(options,
                 name=('n', '', 'application name'),
                 profile=('r', '', 'profile name')):
@@ -353,7 +351,7 @@ def app_restart(options,
     })
 
 
-@appDispatcher.command()
+@dispatcher.app.command()
 def check(options,
           name=('n', '', 'application name')):
     """Checks application status."""
@@ -365,7 +363,7 @@ def check(options,
     })
 
 
-@profileDispatcher.command(name='list')
+@dispatcher.profile.command(name='list')
 def profile_list(options):
     """Show installed profiles."""
     options.executor.executeAction('profile:list', **{
@@ -373,7 +371,7 @@ def profile_list(options):
     })
 
 
-@profileDispatcher.command(name='view')
+@dispatcher.profile.command(name='view')
 def profile_view(options,
                  name=('n', '', 'profile name')):
     """Show profile configuration context."""
@@ -383,7 +381,7 @@ def profile_view(options,
     })
 
 
-@profileDispatcher.command(name='upload')
+@dispatcher.profile.command(name='upload')
 def profile_upload(options,
                    name=('n', '', 'profile name'),
                    profile=('', '', 'path to profile file')):
@@ -395,7 +393,7 @@ def profile_upload(options,
     })
 
 
-@profileDispatcher.command(name='remove')
+@dispatcher.profile.command(name='remove')
 def profile_remove(options,
                    name=('n', '', 'profile name')):
     """Remove profile from the storage."""
@@ -405,7 +403,7 @@ def profile_remove(options,
     })
 
 
-@runlistDispatcher.command(name='list')
+@dispatcher.runlist.command(name='list')
 def runlist_list(options):
     """Show uploaded runlists."""
     options.executor.executeAction('runlist:list', **{
@@ -413,7 +411,7 @@ def runlist_list(options):
     })
 
 
-@runlistDispatcher.command(name='view')
+@dispatcher.runlist.command(name='view')
 def runlist_view(options,
                  name=('n', '', 'name')):
     """Show configuration context for runlist."""
@@ -423,7 +421,7 @@ def runlist_view(options,
     })
 
 
-@runlistDispatcher.command(name='upload')
+@dispatcher.runlist.command(name='upload')
 def runlist_upload(options,
                    name=('n', '', 'name'),
                    runlist=('', '', 'path to the runlist configuration json file')):
@@ -435,7 +433,7 @@ def runlist_upload(options,
     })
 
 
-@runlistDispatcher.command(name='create')
+@dispatcher.runlist.command(name='create')
 def runlist_create(options,
                    name=('n', '', 'name')):
     """Create runlist and upload it into the storage."""
@@ -445,7 +443,7 @@ def runlist_create(options,
     })
 
 
-@runlistDispatcher.command(name='remove')
+@dispatcher.runlist.command(name='remove')
 def runlist_remove(options,
                    name=('n', '', 'name')):
     """Remove runlist from the storage."""
@@ -455,7 +453,7 @@ def runlist_remove(options,
     })
 
 
-@runlistDispatcher.command(name='add-app')
+@dispatcher.runlist.command(name='add-app')
 def runlist_add_app(options,
                     name=('n', '', 'runlist name'),
                     app=('', '', 'application name'),
@@ -474,7 +472,7 @@ def runlist_add_app(options,
     })
 
 
-@crashlogDispatcher.command(name='status')
+@dispatcher.crashlog.command(name='status')
 def crashlog_status(options):
     """Show crashlog status.
     """
@@ -482,7 +480,7 @@ def crashlog_status(options):
         'storage': options.getService('storage'),
     })
 
-@crashlogDispatcher.command(name='list')
+@dispatcher.crashlog.command(name='list')
 def crashlog_list(options,
                   name=('n', '', 'name')):
     """Show crashlogs list for application.
@@ -495,7 +493,7 @@ def crashlog_list(options,
     })
 
 
-@crashlogDispatcher.command(name='view')
+@dispatcher.crashlog.command(name='view')
 def crashlog_view(options,
                   name=('n', '', 'name'),
                   timestamp=('t', '', 'timestamp')):
@@ -507,7 +505,7 @@ def crashlog_view(options,
     })
 
 
-@crashlogDispatcher.command(name='remove')
+@dispatcher.crashlog.command(name='remove')
 def crashlog_remove(options,
                     name=('n', '', 'name'),
                     timestamp=('t', '', 'timestamp')):
@@ -519,7 +517,7 @@ def crashlog_remove(options,
     })
 
 
-@crashlogDispatcher.command(name='removeall')
+@dispatcher.crashlog.command(name='removeall')
 def crashlog_removeall(options,
                        name=('n', '', 'name')):
     """Remove all crashlogs for application from the storage."""
@@ -631,7 +629,7 @@ def group_pop(options,
 DEFAULT_COCAINE_PROXY_PID_FILE = '/var/run/cocaine-python-proxy.pid'
 
 
-@proxyDispatcher.command()
+@dispatcher.proxy.command()
 def start(port=('', 8080, 'server port'),
           count=('', 0, 'server subprocess count (0 means optimal for current CPU count)'),
           config=('', '/etc/cocaine/cocaine-tornado-proxy.conf', 'path to the configuration file'),
@@ -652,7 +650,7 @@ def start(port=('', 8080, 'server port'),
         logging.getLogger('cocaine.tools').error('Cocaine tool error - %s', err)
 
 
-@proxyDispatcher.command()
+@dispatcher.proxy.command()
 def stop(pidfile=('', DEFAULT_COCAINE_PROXY_PID_FILE, 'pidfile')):
     """Stop embedded cocaine proxy.
     """
@@ -665,7 +663,7 @@ def stop(pidfile=('', DEFAULT_COCAINE_PROXY_PID_FILE, 'pidfile')):
         logging.getLogger('cocaine.tools').error('Cocaine tool error - %s', err)
 
 
-@proxyDispatcher.command()
+@dispatcher.proxy.command()
 def status(pidfile=('', DEFAULT_COCAINE_PROXY_PID_FILE, 'pidfile')):
     """Show embedded cocaine proxy status.
     """
@@ -678,9 +676,9 @@ def status(pidfile=('', DEFAULT_COCAINE_PROXY_PID_FILE, 'pidfile')):
         logging.getLogger('cocaine.tools').error('Cocaine tool error - %s', err)
 
 
-d.nest('app', appDispatcher, 'application commands')
-d.nest('profile', profileDispatcher, 'profile commands')
-d.nest('runlist', runlistDispatcher, 'runlist commands')
-d.nest('crashlog', crashlogDispatcher, 'crashlog commands')
+d.nest('app', dispatcher.app, 'application commands')
+d.nest('profile', dispatcher.profile, 'profile commands')
+d.nest('runlist', dispatcher.runlist, 'runlist commands')
+d.nest('crashlog', dispatcher.crashlog, 'crashlog commands')
 d.nest('group', dispatcher.group, 'routing group commands')
-d.nest('proxy', proxyDispatcher, 'cocaine proxy commands')
+d.nest('proxy', dispatcher.proxy, 'cocaine proxy commands')
