@@ -6,7 +6,7 @@ import time
 from tornado.ioloop import IOLoop
 
 from cocaine import concurrent
-from cocaine.exceptions import CocaineError
+from cocaine.exceptions import Error as CocaineError
 from cocaine.protocol import ChokeEvent
 from cocaine.tools.actions import common, app, profile, runlist, crashlog, group
 from cocaine.tools.error import Error as ToolsError
