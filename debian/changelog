@@ -1,3 +1,9 @@
+cocaine-tools (1.0.0.0-alpha) unstable; urgency=low
+
+  * Pre-alpha version.
+
+ -- Evgeny Safronov <division494@gmail.com>  Tue, 12 Nov 2013 18:25:00 +0400
+
 cocaine-tools (0.11.1.0) unstable; urgency=low
 
   * Routing group support.
