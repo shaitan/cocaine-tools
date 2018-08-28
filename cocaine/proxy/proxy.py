@@ -356,12 +356,12 @@ class CocaineProxy(object):
 
     @gen.coroutine
     def locator_health_check(self, period=5):
-        wait_timeot = datetime.timedelta(seconds=period)
+        wait_timeout = datetime.timedelta(seconds=period)
         while True:
             try:
                 self.logger.debug("check health status of locator via cluster method")
-                channel = yield gen.with_timeout(wait_timeot, self.locator.cluster())
-                cluster = yield gen.with_timeout(wait_timeot, channel.rx.get())
+                channel = yield gen.with_timeout(wait_timeout, self.locator.cluster())
+                cluster = yield gen.with_timeout(wait_timeout, channel.rx.get())
                 self.locator_status = True
                 self.logger.debug("dumped cluster %s", cluster)
                 yield gen.sleep(period)
