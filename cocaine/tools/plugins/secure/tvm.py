@@ -1,10 +1,8 @@
 import logging
-import socket
 
 from tornado import gen
 
 from cocaine.decorators import coroutine
-from cocaine.tools.error import ToolsError
 
 from . import SecurePlugin
 
@@ -18,21 +16,14 @@ class TVM(SecurePlugin):
         self._client_id = client_id
         self._client_secret = client_secret
 
-        addrinfo = socket.getaddrinfo(socket.gethostname(), None)
-        if len(addrinfo) == 0:
-            raise ToolsError('failed to determine local IP address')
-
-        self._ip = addrinfo[0][4][0]
-        self._tvm = repo.create_service('tvm')
+        self._tvm = repo.create_service('tvm2')
 
     def ty(self):
-        return 'TVM'
+        return 'TVM2'
 
     @coroutine
     def fetch_token(self):
-        grant_type = 'client_credentials'
-
-        channel = yield self._tvm.ticket_full(self._client_id, self._client_secret, grant_type, {})
+        channel = yield self._tvm.ticket(self._client_id, self._client_secret)
         ticket = yield channel.rx.get()
         log.debug('exchanged client secret with TVM ticket')
         raise gen.Return(self._make_header(ticket))
