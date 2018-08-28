@@ -23,9 +23,9 @@
 #
 
 import os
-import re
 
 from setuptools import setup
+from cocaine.tools import version
 
 
 if 'DEB_BUILD_GNU_TYPE' in os.environ:
@@ -36,16 +36,9 @@ else:
     tools_data = []
 
 
-try:
-    with open('cocaine/tools/version.py', 'r') as version_file:
-        version = re.search("__version__ = \"(.+)\"", version_file.read()).groups()[0]
-except Exception as err:
-    raise Exception("unable to identify version: %s" % err)
-
-
 setup(
     name="cocaine-tools",
-    version=version,
+    version=version.__version__,
     author="Anton Tyurin",
     author_email="noxiouz@yandex.ru",
     maintainer='Evgeny Safronov',
